@@ -20,6 +20,7 @@ export default function SignIn() {
           formData.set("flow", flow);
           void signIn("password", formData)
             .catch((error) => {
+              console.log(error)
               setError(error.message);
             })
             .then(() => {

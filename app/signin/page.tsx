@@ -14,14 +14,26 @@ export default function SignIn() {
       <p>Log in to see the numbers</p>
       <form
         className="flex flex-col gap-2"
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault();
           const formData = new FormData(e.target as HTMLFormElement);
           formData.set("flow", flow);
-          void signIn("password", formData)
+          await signIn("password", formData)
             .catch((error) => {
-              console.log(error)
-              setError(error.message);
+              console.log('ERROR IS :', error)
+              const errorString = String(error);
+              // Try to match the complex server error format first
+              const serverMatch = errorString.match(/Error: \[Request ID: [a-z0-9]+\] Server Error\s*Uncaught ConvexError:\s*(.*)/);
+              console.log(serverMatch)
+              // If that doesn't match, try to extract from the simple error format
+              const simpleMatch = errorString.match(/Error signing in:\s*(.*)/);
+              if (serverMatch && serverMatch[1]) {
+                setError(serverMatch[1].trim());
+              } else if (simpleMatch && simpleMatch[1]) {
+                setError(simpleMatch[1].trim());
+              } else {
+                setError("An unexpected error occurred");
+              }
             })
             .then(() => {
               router.push("/");
@@ -30,7 +42,7 @@ export default function SignIn() {
       >
         <input
           className="bg-background text-foreground rounded-md p-2 border-2 border-slate-200 dark:border-slate-800"
-          type="email"
+          // type="email"
           name="email"
           placeholder="Email"
         />
@@ -62,7 +74,7 @@ export default function SignIn() {
         {error && (
           <div className="bg-red-500/20 border-2 border-red-500/50 rounded-md p-2">
             <p className="text-foreground font-mono text-xs">
-              Error signing in: {error}
+              {error}
             </p>
           </div>
         )}

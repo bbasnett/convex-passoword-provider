@@ -4,27 +4,24 @@ import { ConvexError } from "convex/values";
 import { z } from "zod";
 
 const ParamsSchema = z.object({
-    email: z.email(),
+  email: z.email(),
 });
 
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
-    providers: [
-        Password({
-            profile(params) {
-                const { error, data } = ParamsSchema.safeParse(params);
-                if (error) {
-                    // throw new ConvexError(error.message);
-                    throw new ConvexError("Invalid Email Address");
-                }
-                return { email: data.email };
-            },
-            validatePasswordRequirements: (password: string) => {
-                if (password.length < 4) {
-                    throw new ConvexError(
-                        "Password must be at least 4 characters long."
-                    );
-                }
-            },
-        }),
-    ],
+  providers: [
+    Password({
+      profile(params) {
+        const { error, data } = ParamsSchema.safeParse(params);
+        if (error) {
+          throw new ConvexError("Invalid Email Address format Bikash");
+        }
+        return { email: data.email };
+      },
+      validatePasswordRequirements: (password: string) => {
+        if (password.length < 4) {
+          throw new ConvexError("Password must be at least 4 characters long.");
+        }
+      },
+    }),
+  ],
 });
